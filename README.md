@@ -1,8 +1,15 @@
 # Channel Flow tag for Google Tag Manager Server Side
 
-## How to use Channel Flow tag
+Channel flow tag for the Google Tag Manager server container stores the source/medium of users' first interaction, last one, and all in between interactions in cookies.
 
-TBD
+## Cookie names of Channel Flow tag:
+
+- *Channel_flow* - records the source/medium flow of all user interactions with the site
+- *Channel_flow_first* - records the first source/medium
+- *Channel_flow_last* - records the last source/medium
+
+### Useful links:
+- [Track users first last source medium using server Google Tag Manager](https://stape.io/blog/track-users-first-last-source-medium-using-server-google-tag-manager)
 
 
 ## Open Source
