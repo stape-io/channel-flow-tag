@@ -78,9 +78,8 @@ function getCurrentChannel() {
     }
 
     if (referrerHostname && referrerHostname.match(data.searchEngineExpression)) {
-        const referrerHostnameParts = referrerHostname.split('.');
-
-        return referrerHostnameParts[referrerHostnameParts.length-2]+ '/organic';
+        const referrerHostnameParts = referrerHostname.replace('www.', '').split('.');
+        return referrerHostnameParts[0] + '/organic';
     }
 
     return referrerHostname + '/referral';

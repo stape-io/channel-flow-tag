@@ -183,9 +183,8 @@ function getCurrentChannel() {
     }
 
     if (referrerHostname && referrerHostname.match(data.searchEngineExpression)) {
-        const referrerHostnameParts = referrerHostname.split('.');
-
-        return referrerHostnameParts[referrerHostnameParts.length-2]+ '/organic';
+        const referrerHostnameParts = referrerHostname.replace('www.', '').split('.');
+        return referrerHostnameParts[0] + '/organic';
     }
 
     return referrerHostname + '/referral';
@@ -453,7 +452,54 @@ ___SERVER_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+scenarios:
+- name: direct/none
+  code: |-
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: google/organic
+  code: |-
+    mockData.referrerSource = 'https://google.com';
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'google/organic', cookieOptions, true);
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: utm/parameters
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/?utm_source=utm&utm_medium=parameters';
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'utm/parameters', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'utm/parameters', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'utm/parameters', cookieOptions, true);
+
+    assertApi('gtmOnSuccess').wasCalled();
+setup: |
+  const mockData = {
+    urlSource: 'https://demo.stape.io/',
+    referrerSource: '',
+    searchEngineExpression: '.*google.*',
+    cookieTime: 63072000
+  };
+
+  const cookieOptions = {
+      domain: 'auto',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      httpOnly: false
+  };
+  cookieOptions['max-age'] = 63072000;
 
 
 ___NOTES___
