@@ -1,5 +1,7 @@
 homepage: "https://stape.io/"
 versions:
+  - sha: d9db60de3c2f27acbf859c0c92909e2c458f8324
+    changeNotes: Add ability to store UTM parameters.
   - sha: 122430b476b871486a44551eb888b42f2a11e001
     changeNotes: Fix issue with google organic parsing. Add tests.
   - sha: 58fe41b495657b8a348917a4a4bae9f1cdcdc60c
