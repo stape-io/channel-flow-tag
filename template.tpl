@@ -90,6 +90,13 @@ ___TEMPLATE_PARAMETERS___
     "help": "Used to exclude referrer if needed.\n\u003cbr\u003e\u003cbr\u003e\nFor example: \n\u003cbr\u003e\n(shop.example.com|blog.example.com)"
   },
   {
+    "type": "TEXT",
+    "name": "ignoreReferrerExpression",
+    "displayName": "Ignore Referrer Expression",
+    "simpleValueType": true,
+    "help": "Any referrer hostname matching this expression will be skipped and not added to the user journey. Use .* to skip any referrer entries."
+  },
+  {
     "type": "CHECKBOX",
     "name": "storeFirstUTM",
     "checkboxText": "Store first occurred UTM parameters",
@@ -174,7 +181,7 @@ function getChannelFlow() {
         return currentChannel;
     }
 
-    if (currentChannel === 'direct/none') {
+    if (currentChannel === 'direct/none' || currentChannel === '') {
         return channelFlowCookie;
     }
 
@@ -202,6 +209,10 @@ function getCurrentChannel() {
     }
 
     const referrerHostname = parsedReferrer.hostname;
+
+    if (referrerHostname && data.ignoreReferrerExpression && referrerHostname.match(data.ignoreReferrerExpression)) {
+        return '';
+    }
 
     if (referrerHostname === parsedUrl.hostname) {
         return 'direct/none';
@@ -1086,6 +1097,44 @@ scenarios:
     assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
 
     assertApi('gtmOnSuccess').wasCalled();
+- name: When journey exists then referrer is added to journey
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/';
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', ['direct/none']);
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none,stape.dev/referral', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, true);
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: When ignore referrer hostname matches then referrer is not added to journey
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/';
+    mockData.referrerSource = 'https://stape.dev';
+    mockData.ignoreReferrerExpression = '.*';
+
+    mock('getCookieValues', ['direct/none']);
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: When ignore referrer hostname matches on first visit then no journey is created
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/';
+    mockData.referrerSource = 'https://stape.dev';
+    mockData.ignoreReferrerExpression = 'stape.*';
+
+    runCode(mockData);
+
+    assertApi('gtmOnFailure').wasCalled();
 setup: |-
   const mockData = {
     urlSource: 'https://demo.stape.io/',
