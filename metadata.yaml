@@ -1,5 +1,7 @@
 homepage: "https://stape.io/"
 versions:
+  - sha: 738f198e218abfac2ee70c8da83943714fc83e38
+    changeNotes: Add option to ignore referrer in journey.
   - sha: d9db60de3c2f27acbf859c0c92909e2c458f8324
     changeNotes: Add ability to store UTM parameters.
   - sha: 122430b476b871486a44551eb888b42f2a11e001
