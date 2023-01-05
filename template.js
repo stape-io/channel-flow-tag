@@ -48,7 +48,7 @@ function getChannelFlow() {
         return currentChannel;
     }
 
-    if (currentChannel === 'direct/none') {
+    if (currentChannel === 'direct/none' || currentChannel === '') {
         return channelFlowCookie;
     }
 
@@ -76,6 +76,10 @@ function getCurrentChannel() {
     }
 
     const referrerHostname = parsedReferrer.hostname;
+
+    if (referrerHostname && data.ignoreReferrerExpression && referrerHostname.match(data.ignoreReferrerExpression)) {
+        return '';
+    }
 
     if (referrerHostname === parsedUrl.hostname) {
         return 'direct/none';
