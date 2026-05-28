@@ -30,101 +30,160 @@ ___TEMPLATE_PARAMETERS___
 
 [
   {
-    "type": "SELECT",
-    "name": "urlSource",
-    "displayName": "URL Source",
-    "macrosInSelect": true,
-    "selectItems": [
+    "type": "GROUP",
+    "name": "configGroup",
+    "displayName": "",
+    "groupStyle": "NO_ZIPPY",
+    "subParams": [
       {
-        "value": "page_location_default",
-        "displayValue": "page_location"
-      }
-    ],
-    "simpleValueType": true,
-    "help": "Choose \u003cb\u003epage_location\u003c/b\u003e to use URL from \u003ca href\u003d\"https://developers.google.com/tag-manager/serverside/common-event-data\" target\u003d\"_blank\"\u003eCommon Event Data\u003c/a\u003e, or provide a variable that returns a valid URL string.",
-    "valueValidators": [
-      {
-        "type": "NON_EMPTY"
-      }
-    ],
-    "defaultValue": "page_location_default"
-  },
-  {
-    "type": "SELECT",
-    "name": "referrerSource",
-    "displayName": "Referrer Source",
-    "macrosInSelect": true,
-    "selectItems": [
-      {
-        "value": "page_referrer_default",
-        "displayValue": "page_referrer"
-      }
-    ],
-    "simpleValueType": true,
-    "help": "Choose \u003cb\u003epage_referrer\u003c/b\u003e to use Referrer from \u003ca href\u003d\"https://developers.google.com/tag-manager/serverside/common-event-data\" target\u003d\"_blank\"\u003eCommon Event Data\u003c/a\u003e, or provide a variable that returns a valid Referrer URL string.",
-    "valueValidators": [
-      {
-        "type": "NON_EMPTY"
-      }
-    ],
-    "defaultValue": "page_referrer_default"
-  },
-  {
-    "type": "TEXT",
-    "name": "searchEngineExpression",
-    "displayName": "Search Engines Regular Expression",
-    "simpleValueType": true,
-    "valueValidators": [
-      {
-        "type": "NON_EMPTY"
-      }
-    ],
-    "defaultValue": "(.*google\\..*)|(duckduckgo\\.com)|(.*bing\\.com)|(baidu\\..*)|(yandex\\..*)",
-    "help": "Used to determine if the user is referred by a search engine or not."
-  },
-  {
-    "type": "TEXT",
-    "name": "excludeReferrerExpression",
-    "displayName": "Referrer Exclude Expression",
-    "simpleValueType": true,
-    "help": "Used to exclude referrer if needed.\n\u003cbr\u003e\u003cbr\u003e\nFor example: \n\u003cbr\u003e\n(shop.example.com|blog.example.com)"
-  },
-  {
-    "type": "TEXT",
-    "name": "ignoreReferrerExpression",
-    "displayName": "Ignore Referrer Expression",
-    "simpleValueType": true,
-    "help": "Any referrer hostname matching this expression will be skipped and not added to the user journey. Use .* to skip any referrer entries."
-  },
-  {
-    "type": "CHECKBOX",
-    "name": "storeFirstUTM",
-    "checkboxText": "Store first occurred UTM parameters",
-    "simpleValueType": true,
-    "help": "Stores values of all parameters inside the cookies if any occur the first time inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source_first\u003c/li\u003e\n\u003cli\u003eutm_medium_first\u003c/li\u003e\n\u003cli\u003eutm_campaign_first\u003c/li\u003e\n\u003cli\u003eutm_content_first\u003c/li\u003e\n\u003cli\u003eutm_term_first\u003c/li\u003e\n\u003c/ul\u003e"
-  },
-  {
-    "type": "CHECKBOX",
-    "name": "storeLastUTM",
-    "checkboxText": "Store last occurred UTM parameters",
-    "simpleValueType": true,
-    "help": "Stores values of all parameters inside the cookies if any occur inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e"
-  },
-  {
-    "type": "TEXT",
-    "name": "cookieTime",
-    "displayName": "Cookie lifetime",
-    "simpleValueType": true,
-    "valueValidators": [
-      {
-        "type": "NON_EMPTY"
+        "type": "TEXT",
+        "name": "text1",
+        "displayName": "",
+        "simpleValueType": true
       },
       {
-        "type": "NON_NEGATIVE_NUMBER"
+        "type": "SELECT",
+        "name": "urlSource",
+        "displayName": "URL Source",
+        "macrosInSelect": true,
+        "selectItems": [
+          {
+            "value": "page_location_default",
+            "displayValue": "page_location"
+          }
+        ],
+        "simpleValueType": true,
+        "help": "Choose \u003cb\u003epage_location\u003c/b\u003e to use URL from \u003ca href\u003d\"https://developers.google.com/tag-manager/serverside/common-event-data\" target\u003d\"_blank\"\u003eCommon Event Data\u003c/a\u003e, or provide a variable that returns a valid URL string.",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "defaultValue": "page_location_default"
+      },
+      {
+        "type": "SELECT",
+        "name": "referrerSource",
+        "displayName": "Referrer Source",
+        "macrosInSelect": true,
+        "selectItems": [
+          {
+            "value": "page_referrer_default",
+            "displayValue": "page_referrer"
+          }
+        ],
+        "simpleValueType": true,
+        "help": "Choose \u003cb\u003epage_referrer\u003c/b\u003e to use Referrer from \u003ca href\u003d\"https://developers.google.com/tag-manager/serverside/common-event-data\" target\u003d\"_blank\"\u003eCommon Event Data\u003c/a\u003e, or provide a variable that returns a valid Referrer URL string.",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "defaultValue": "page_referrer_default"
+      },
+      {
+        "type": "TEXT",
+        "name": "searchEngineExpression",
+        "displayName": "Search Engines Regular Expression",
+        "simpleValueType": true,
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ],
+        "defaultValue": "(.*google\\..*)|(duckduckgo\\.com)|(.*bing\\.com)|(baidu\\..*)|(yandex\\..*)",
+        "help": "Used to determine if the user is referred by a search engine or not."
+      },
+      {
+        "type": "TEXT",
+        "name": "excludeReferrerExpression",
+        "displayName": "Referrer Exclude Expression",
+        "simpleValueType": true,
+        "help": "Used to exclude referrer if needed.\n\u003cbr\u003e\u003cbr\u003e\nFor example: \n\u003cbr\u003e\n(shop.example.com|blog.example.com)"
+      },
+      {
+        "type": "TEXT",
+        "name": "ignoreReferrerExpression",
+        "displayName": "Ignore Referrer Expression",
+        "simpleValueType": true,
+        "help": "Any referrer hostname matching this expression will be skipped and not added to the user journey. Use .* to skip any referrer entries."
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "storeFirstUTM",
+        "checkboxText": "Store first occurred UTM parameters",
+        "simpleValueType": true,
+        "help": "Stores values of all parameters inside the cookies if any occur the first time inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source_first\u003c/li\u003e\n\u003cli\u003eutm_medium_first\u003c/li\u003e\n\u003cli\u003eutm_campaign_first\u003c/li\u003e\n\u003cli\u003eutm_content_first\u003c/li\u003e\n\u003cli\u003eutm_term_first\u003c/li\u003e\n\u003c/ul\u003e"
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "storeLastUTM",
+        "checkboxText": "Store last occurred UTM parameters",
+        "simpleValueType": true,
+        "help": "Stores values of all parameters inside the cookies if any occur inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e"
+      },
+      {
+        "type": "TEXT",
+        "name": "cookieTime",
+        "displayName": "Cookie lifetime",
+        "simpleValueType": true,
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          },
+          {
+            "type": "NON_NEGATIVE_NUMBER"
+          }
+        ],
+        "help": "Channel Flow cookies expiration in seconds (set 0 for session cookie). \n\u003cbr\u003e\n2 years by default.",
+        "defaultValue": 63072000
       }
-    ],
-    "help": "Channel Flow cookies expiration in seconds (set 0 for session cookie). \n\u003cbr\u003e\n2 years by default.",
-    "defaultValue": 63072000
+    ]
+  },
+  {
+    "type": "GROUP",
+    "name": "tagExecutionConsentSettingsGroup",
+    "displayName": "Tag Execution Consent Settings",
+    "groupStyle": "ZIPPY_CLOSED",
+    "subParams": [
+      {
+        "type": "RADIO",
+        "name": "consent",
+        "displayName": "",
+        "radioItems": [
+          {
+            "value": "optional",
+            "displayValue": "Always execute"
+          },
+          {
+            "value": "required",
+            "displayValue": "Only execute in case consent given",
+            "help": "Aborts the tag execution if consent (from Google Consent Mode or Stape\u0027s Data Tag parameter) is not given.",
+            "subParams": [
+              {
+                "type": "SELECT",
+                "name": "consentStatusParameter",
+                "selectItems": [
+                  {
+                    "value": "analytics_storage",
+                    "displayValue": "analytics_storage"
+                  },
+                  {
+                    "value": "ad_storage",
+                    "displayValue": "ad_storage"
+                  }
+                ],
+                "simpleValueType": true,
+                "defaultValue": "analytics_storage",
+                "displayName": "Consent Status Parameter"
+              }
+            ]
+          }
+        ],
+        "simpleValueType": true,
+        "defaultValue": "optional"
+      }
+    ]
   }
 ]
 
@@ -132,33 +191,45 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_SERVER___
 
 const getEventData = require('getEventData');
+const getAllEventData = require('getAllEventData');
 const getCookieValues = require('getCookieValues');
 const setCookie = require('setCookie');
 const parseUrl = require('parseUrl');
 const makeString = require('makeString');
 
-const parsedUrl = parseUrl(data.urlSource === 'page_location_default' ? getEventData('page_location') : data.urlSource);
+/*==============================================================================
+==============================================================================*/
+
+const eventData = getAllEventData();
+
+if (!isConsentGivenOrNotRequired(data, eventData)) {
+  return data.gtmOnSuccess();
+}
+
+const parsedUrl = parseUrl(
+  data.urlSource === 'page_location_default' ? getEventData('page_location') : data.urlSource
+);
 
 if (!parsedUrl) {
-    data.gtmOnFailure();
+  data.gtmOnFailure();
 
-    return;
+  return;
 }
 
 let channelFlow = getChannelFlow();
 
 if (!channelFlow) {
-    data.gtmOnFailure();
+  data.gtmOnFailure();
 
-    return;
+  return;
 }
 
 const cookieOptions = {
-    domain: 'auto',
-    path: '/',
-    samesite: 'Lax',
-    secure: true,
-    httpOnly: false
+  domain: 'auto',
+  path: '/',
+  samesite: 'Lax',
+  secure: true,
+  httpOnly: false
 };
 
 if (data.cookieTime > 0) cookieOptions['max-age'] = data.cookieTime;
@@ -172,112 +243,190 @@ if (data.storeLastUTM) storeLastUTM();
 
 data.gtmOnSuccess();
 
+/*==============================================================================
+Helpers
+==============================================================================*/
 
 function getChannelFlow() {
-    const channelFlowCookie = getCookieValues('channel_flow')[0];
-    const currentChannel = getCurrentChannel();
+  const channelFlowCookie = getCookieValues('channel_flow')[0];
+  const currentChannel = getCurrentChannel();
 
-    if (!channelFlowCookie) {
-        return currentChannel;
-    }
+  if (!channelFlowCookie) {
+    return currentChannel;
+  }
 
-    if (currentChannel === 'direct/none' || currentChannel === '') {
-        return channelFlowCookie;
-    }
+  if (currentChannel === 'direct/none' || currentChannel === '') {
+    return channelFlowCookie;
+  }
 
-    const channelFlowLastCookie = getCookieValues('channel_flow_last')[0];
+  const channelFlowLastCookie = getCookieValues('channel_flow_last')[0];
 
-    if (currentChannel === channelFlowLastCookie) {
-        return channelFlowCookie;
-    }
+  if (currentChannel === channelFlowLastCookie) {
+    return channelFlowCookie;
+  }
 
-    return channelFlowCookie + ',' + currentChannel;
+  return channelFlowCookie + ',' + currentChannel;
 }
 
 function getCurrentChannel() {
-    const utmSource = parsedUrl.searchParams.utm_source;
-    const utmMedium = parsedUrl.searchParams.utm_medium;
+  const utmSource = parsedUrl.searchParams.utm_source;
+  const utmMedium = parsedUrl.searchParams.utm_medium;
 
-    if (utmSource || utmMedium) {
-        return (utmSource ? utmSource : 'direct') + '/' + (utmMedium ? utmMedium : 'none');
-    }
+  if (utmSource || utmMedium) {
+    return (utmSource ? utmSource : 'direct') + '/' + (utmMedium ? utmMedium : 'none');
+  }
 
-    const parsedReferrer = parseUrl(data.referrerSource === 'page_referrer_default' ? getEventData('page_referrer') : data.referrerSource);
+  const parsedReferrer = parseUrl(
+    data.referrerSource === 'page_referrer_default'
+      ? getEventData('page_referrer')
+      : data.referrerSource
+  );
 
-    if (!parsedReferrer) {
-        return 'direct/none';
-    }
+  if (!parsedReferrer) {
+    return 'direct/none';
+  }
 
-    const referrerHostname = parsedReferrer.hostname;
+  const referrerHostname = parsedReferrer.hostname;
 
-    if (referrerHostname && data.ignoreReferrerExpression && referrerHostname.match(data.ignoreReferrerExpression)) {
-        return '';
-    }
+  if (
+    referrerHostname &&
+    data.ignoreReferrerExpression &&
+    referrerHostname.match(data.ignoreReferrerExpression)
+  ) {
+    return '';
+  }
 
-    if (referrerHostname === parsedUrl.hostname) {
-        return 'direct/none';
-    }
+  if (referrerHostname === parsedUrl.hostname) {
+    return 'direct/none';
+  }
 
-    if (referrerHostname && data.searchEngineExpression && referrerHostname.match(data.searchEngineExpression)) {
-        const referrerHostnameParts = referrerHostname.replace('www.', '').split('.');
-        return referrerHostnameParts[0] + '/organic';
-    }
+  if (
+    referrerHostname &&
+    data.searchEngineExpression &&
+    referrerHostname.match(data.searchEngineExpression)
+  ) {
+    const referrerHostnameParts = referrerHostname.replace('www.', '').split('.');
+    return referrerHostnameParts[0] + '/organic';
+  }
 
-    if (referrerHostname && data.excludeReferrerExpression && referrerHostname.match(data.excludeReferrerExpression)) {
-        return 'direct/none';
-    }
+  if (
+    referrerHostname &&
+    data.excludeReferrerExpression &&
+    referrerHostname.match(data.excludeReferrerExpression)
+  ) {
+    return 'direct/none';
+  }
 
-    return referrerHostname + '/referral';
+  return referrerHostname + '/referral';
 }
 
 function getLastChannelFromChannelFlow(channelFlow) {
-    let channels = channelFlow.split(',');
+  let channels = channelFlow.split(',');
 
-    return channels[channels.length - 1];
+  return channels[channels.length - 1];
 }
 
 function getFirstChannelFromChannelFlow(channelFlow) {
-    let channels = channelFlow.split(',');
+  let channels = channelFlow.split(',');
 
-    return channels[0];
+  return channels[0];
 }
 
 function storeFirstUTM() {
-    if (
-        !getCookieValues('utm_source_first')[0]
-        && !getCookieValues('utm_medium_first')[0]
-        && !getCookieValues('utm_campaign_first')[0]
-        && !getCookieValues('utm_content_first')[0] && !getCookieValues('utm_term_first')[0]
-        && (
-            parsedUrl.searchParams.utm_source
-            || parsedUrl.searchParams.utm_medium
-            || parsedUrl.searchParams.utm_campaign
-            || parsedUrl.searchParams.utm_content
-            || parsedUrl.searchParams.utm_term
-        )
-    ) {
-        setCookie('utm_source_first', parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '', cookieOptions, true);
-        setCookie('utm_medium_first', parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '', cookieOptions, true);
-        setCookie('utm_campaign_first', parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '', cookieOptions, true);
-        setCookie('utm_content_first', parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '', cookieOptions, true);
-        setCookie('utm_term_first', parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '', cookieOptions, true);
-    }
+  if (
+    !getCookieValues('utm_source_first')[0] &&
+    !getCookieValues('utm_medium_first')[0] &&
+    !getCookieValues('utm_campaign_first')[0] &&
+    !getCookieValues('utm_content_first')[0] &&
+    !getCookieValues('utm_term_first')[0] &&
+    (parsedUrl.searchParams.utm_source ||
+      parsedUrl.searchParams.utm_medium ||
+      parsedUrl.searchParams.utm_campaign ||
+      parsedUrl.searchParams.utm_content ||
+      parsedUrl.searchParams.utm_term)
+  ) {
+    setCookie(
+      'utm_source_first',
+      parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_medium_first',
+      parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_campaign_first',
+      parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_content_first',
+      parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_term_first',
+      parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
+      cookieOptions,
+      true
+    );
+  }
 }
 
 function storeLastUTM() {
-    if (
-        parsedUrl.searchParams.utm_source
-        || parsedUrl.searchParams.utm_medium
-        || parsedUrl.searchParams.utm_campaign
-        || parsedUrl.searchParams.utm_content
-        || parsedUrl.searchParams.utm_term
-    ) {
-        setCookie('utm_source', parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '', cookieOptions, true);
-        setCookie('utm_medium', parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '', cookieOptions, true);
-        setCookie('utm_campaign', parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '', cookieOptions, true);
-        setCookie('utm_content', parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '', cookieOptions, true);
-        setCookie('utm_term', parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '', cookieOptions, true);
-    }
+  if (
+    parsedUrl.searchParams.utm_source ||
+    parsedUrl.searchParams.utm_medium ||
+    parsedUrl.searchParams.utm_campaign ||
+    parsedUrl.searchParams.utm_content ||
+    parsedUrl.searchParams.utm_term
+  ) {
+    setCookie(
+      'utm_source',
+      parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_medium',
+      parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_campaign',
+      parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_content',
+      parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
+      cookieOptions,
+      true
+    );
+    setCookie(
+      'utm_term',
+      parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
+      cookieOptions,
+      true
+    );
+  }
+}
+
+function isConsentGivenOrNotRequired(data, eventData) {
+  if (data.consent !== 'required') return true;
+
+  if (eventData.consent_state) return !!eventData.consent_state[data.consentStatusParameter];
+
+  const gcsPositionMapping = { analytics_storage: 3, ad_storage: 2 };
+  const xGaGcs = eventData['x-ga-gcs'] || ''; // x-ga-gcs is a string like "G110"
+  return xGaGcs[gcsPositionMapping[data.consentStatusParameter]] === '1';
 }
 
 
