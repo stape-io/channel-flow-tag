@@ -1,5 +1,8 @@
-homepage: "https://stape.io/"
+homepage: 'https://stape.io/'
+documentation: 'https://github.com/stape-io/channel-flow-tag'
 versions:
+  - sha: ffd9a79e23066c0b505a1797630e2c8149f9b35e
+    changeNotes: Add support to consent settings.
   - sha: 738f198e218abfac2ee70c8da83943714fc83e38
     changeNotes: Add option to ignore referrer in journey.
   - sha: d9db60de3c2f27acbf859c0c92909e2c458f8324
