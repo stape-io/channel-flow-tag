@@ -32,15 +32,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "GROUP",
     "name": "configGroup",
-    "displayName": "",
-    "groupStyle": "NO_ZIPPY",
     "subParams": [
-      {
-        "type": "TEXT",
-        "name": "text1",
-        "displayName": "",
-        "simpleValueType": true
-      },
       {
         "type": "SELECT",
         "name": "urlSource",
@@ -113,14 +105,14 @@ ___TEMPLATE_PARAMETERS___
         "name": "storeFirstUTM",
         "checkboxText": "Store first occurred UTM parameters",
         "simpleValueType": true,
-        "help": "Stores values of all parameters inside the cookies if any occur the first time inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source_first\u003c/li\u003e\n\u003cli\u003eutm_medium_first\u003c/li\u003e\n\u003cli\u003eutm_campaign_first\u003c/li\u003e\n\u003cli\u003eutm_content_first\u003c/li\u003e\n\u003cli\u003eutm_term_first\u003c/li\u003e\n\u003c/ul\u003e"
+        "help": "Stores values of all parameters inside the cookies if any occur the first time inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source_first\u003c/li\u003e\n\u003cli\u003eutm_medium_first\u003c/li\u003e\n\u003cli\u003eutm_campaign_first\u003c/li\u003e\n\u003cli\u003eutm_content_first\u003c/li\u003e\n\u003cli\u003eutm_term_first\u003c/li\u003e\n\u003c/ul\u003e"
       },
       {
         "type": "CHECKBOX",
         "name": "storeLastUTM",
         "checkboxText": "Store last occurred UTM parameters",
         "simpleValueType": true,
-        "help": "Stores values of all parameters inside the cookies if any occur inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies that used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e"
+        "help": "Stores values of all parameters inside the cookies if any occur inside the URL: \n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e\nCookies used:\n\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eutm_source\u003c/li\u003e\n\u003cli\u003eutm_medium\u003c/li\u003e\n\u003cli\u003eutm_campaign\u003c/li\u003e\n\u003cli\u003eutm_content\u003c/li\u003e\n\u003cli\u003eutm_term\u003c/li\u003e\n\u003c/ul\u003e"
       },
       {
         "type": "TEXT",
@@ -149,7 +141,6 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "RADIO",
         "name": "consent",
-        "displayName": "",
         "radioItems": [
           {
             "value": "optional",
@@ -158,24 +149,41 @@ ___TEMPLATE_PARAMETERS___
           {
             "value": "required",
             "displayValue": "Only execute in case consent given",
-            "help": "Aborts the tag execution if consent (from Google Consent Mode or Stape\u0027s Data Tag parameter) is not given.",
+            "help": "Choose the Consent Status Parameter(s) to be checked (from Google Consent Mode or Stape\u0027s Data Tag parameter). The tag aborts its execution if at least one of them is denied.",
             "subParams": [
               {
-                "type": "SELECT",
-                "name": "consentStatusParameter",
-                "selectItems": [
+                "type": "SIMPLE_TABLE",
+                "name": "consentStatusParameters",
+                "simpleTableColumns": [
                   {
-                    "value": "analytics_storage",
-                    "displayValue": "analytics_storage"
-                  },
-                  {
-                    "value": "ad_storage",
-                    "displayValue": "ad_storage"
+                    "defaultValue": "analytics_storage",
+                    "displayName": "Consent Status Parameter",
+                    "name": "parameter",
+                    "type": "SELECT",
+                    "selectItems": [
+                      {
+                        "value": "analytics_storage",
+                        "displayValue": "analytics_storage"
+                      },
+                      {
+                        "value": "ad_storage",
+                        "displayValue": "ad_storage"
+                      }
+                    ],
+                    "isUnique": true,
+                    "valueValidators": [
+                      {
+                        "type": "NON_EMPTY"
+                      }
+                    ]
                   }
                 ],
-                "simpleValueType": true,
-                "defaultValue": "analytics_storage",
-                "displayName": "Consent Status Parameter"
+                "newRowButtonText": "Add Consent Status Parameter",
+                "valueValidators": [
+                  {
+                    "type": "NON_EMPTY"
+                  }
+                ]
               }
             ]
           }
@@ -211,17 +219,13 @@ const parsedUrl = parseUrl(
 );
 
 if (!parsedUrl) {
-  data.gtmOnFailure();
-
-  return;
+  return data.gtmOnFailure();
 }
 
 let channelFlow = getChannelFlow();
 
 if (!channelFlow) {
-  data.gtmOnFailure();
-
-  return;
+  return data.gtmOnFailure();
 }
 
 const cookieOptions = {
@@ -241,7 +245,7 @@ setCookie('channel_flow_last', getLastChannelFromChannelFlow(channelFlow), cooki
 if (data.storeFirstUTM) storeFirstUTM();
 if (data.storeLastUTM) storeLastUTM();
 
-data.gtmOnSuccess();
+return data.gtmOnSuccess();
 
 /*==============================================================================
 Helpers
@@ -422,11 +426,13 @@ function storeLastUTM() {
 function isConsentGivenOrNotRequired(data, eventData) {
   if (data.consent !== 'required') return true;
 
-  if (eventData.consent_state) return !!eventData.consent_state[data.consentStatusParameter];
+  if (eventData.consent_state) {
+    return data.consentStatusParameters.every((d) => !!eventData.consent_state[d.parameter]);
+  }
 
   const gcsPositionMapping = { analytics_storage: 3, ad_storage: 2 };
   const xGaGcs = eventData['x-ga-gcs'] || ''; // x-ga-gcs is a string like "G110"
-  return xGaGcs[gcsPositionMapping[data.consentStatusParameter]] === '1';
+  return data.consentStatusParameters.every((d) => xGaGcs[gcsPositionMapping[d.parameter]] === '1');
 }
 
 
@@ -1155,26 +1161,10 @@ ___SERVER_PERMISSIONS___
       },
       "param": [
         {
-          "key": "keyPatterns",
-          "value": {
-            "type": 2,
-            "listItem": [
-              {
-                "type": 1,
-                "string": "page_location"
-              },
-              {
-                "type": 1,
-                "string": "page_referrer"
-              }
-            ]
-          }
-        },
-        {
           "key": "eventDataAccess",
           "value": {
             "type": 1,
-            "string": "specific"
+            "string": "any"
           }
         }
       ]
@@ -1304,6 +1294,7 @@ setup: |-
 
 ___NOTES___
 
+2026-06-02 - Change Notes:
+  - Add multi-parameter consent enforcement for required mode: the tag now checks all selected consent status parameters and aborts execution if any are denied, for both consent_state and x-ga-gcs inputs
+
 Created on 11/11/2021, 12:07:08
-
-

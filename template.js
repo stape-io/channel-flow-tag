@@ -19,17 +19,13 @@ const parsedUrl = parseUrl(
 );
 
 if (!parsedUrl) {
-  data.gtmOnFailure();
-
-  return;
+  return data.gtmOnFailure();
 }
 
 let channelFlow = getChannelFlow();
 
 if (!channelFlow) {
-  data.gtmOnFailure();
-
-  return;
+  return data.gtmOnFailure();
 }
 
 const cookieOptions = {
@@ -49,7 +45,7 @@ setCookie('channel_flow_last', getLastChannelFromChannelFlow(channelFlow), cooki
 if (data.storeFirstUTM) storeFirstUTM();
 if (data.storeLastUTM) storeLastUTM();
 
-data.gtmOnSuccess();
+return data.gtmOnSuccess();
 
 /*==============================================================================
 Helpers
@@ -230,9 +226,11 @@ function storeLastUTM() {
 function isConsentGivenOrNotRequired(data, eventData) {
   if (data.consent !== 'required') return true;
 
-  if (eventData.consent_state) return !!eventData.consent_state[data.consentStatusParameter];
+  if (eventData.consent_state) {
+    return data.consentStatusParameters.every((d) => !!eventData.consent_state[d.parameter]);
+  }
 
   const gcsPositionMapping = { analytics_storage: 3, ad_storage: 2 };
   const xGaGcs = eventData['x-ga-gcs'] || ''; // x-ga-gcs is a string like "G110"
-  return xGaGcs[gcsPositionMapping[data.consentStatusParameter]] === '1';
+  return data.consentStatusParameters.every((d) => xGaGcs[gcsPositionMapping[d.parameter]] === '1');
 }
