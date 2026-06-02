@@ -8,7 +8,7 @@ Channel flow tag for the Google Tag Manager server container stores the source/m
 - *Channel_flow_first* - records the first source/medium
 - *Channel_flow_last* - records the last source/medium
 
-### Useful links:
+### Useful Resources
 - [Track users first last source medium using server Google Tag Manager](https://stape.io/blog/track-users-first-last-source-medium-using-server-google-tag-manager)
 
 
