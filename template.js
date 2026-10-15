@@ -1,6 +1,7 @@
 ﻿const getEventData = require('getEventData');
 const getAllEventData = require('getAllEventData');
 const getCookieValues = require('getCookieValues');
+const decodeUriComponent = require('decodeUriComponent');
 const setCookie = require('setCookie');
 const parseUrl = require('parseUrl');
 const makeString = require('makeString');
@@ -35,12 +36,23 @@ const cookieOptions = {
   secure: true,
   httpOnly: false
 };
-
 if (data.cookieTime > 0) cookieOptions['max-age'] = data.cookieTime;
 
-setCookie('channel_flow', channelFlow, cookieOptions, true);
-setCookie('channel_flow_first', getFirstChannelFromChannelFlow(channelFlow), cookieOptions, true);
-setCookie('channel_flow_last', getLastChannelFromChannelFlow(channelFlow), cookieOptions, true);
+const noEncodeCookie = !!data.noEncodeCookie;
+
+setCookie('channel_flow', channelFlow, cookieOptions, noEncodeCookie);
+setCookie(
+  'channel_flow_first',
+  getFirstChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
+setCookie(
+  'channel_flow_last',
+  getLastChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
 
 if (data.storeFirstUTM) storeFirstUTM();
 if (data.storeLastUTM) storeLastUTM();
@@ -52,7 +64,7 @@ Helpers
 ==============================================================================*/
 
 function getChannelFlow() {
-  const channelFlowCookie = getCookieValues('channel_flow')[0];
+  const channelFlowCookie = getCookieValue('channel_flow');
   const currentChannel = getCurrentChannel();
 
   if (!channelFlowCookie) {
@@ -63,13 +75,20 @@ function getChannelFlow() {
     return channelFlowCookie;
   }
 
-  const channelFlowLastCookie = getCookieValues('channel_flow_last')[0];
+  const channelFlowLastCookie = getCookieValue('channel_flow_last');
 
   if (currentChannel === channelFlowLastCookie) {
     return channelFlowCookie;
   }
 
   return channelFlowCookie + ',' + currentChannel;
+}
+
+function getCookieValue(name) {
+  const value = getCookieValues(name, true)[0];
+  if (!value) return value;
+  // Cookies stored unencoded by older versions may contain a literal '%' that can't be decoded.
+  return decodeUriComponent(value) || value;
 }
 
 function getCurrentChannel() {
@@ -138,11 +157,11 @@ function getFirstChannelFromChannelFlow(channelFlow) {
 
 function storeFirstUTM() {
   if (
-    !getCookieValues('utm_source_first')[0] &&
-    !getCookieValues('utm_medium_first')[0] &&
-    !getCookieValues('utm_campaign_first')[0] &&
-    !getCookieValues('utm_content_first')[0] &&
-    !getCookieValues('utm_term_first')[0] &&
+    !getCookieValue('utm_source_first') &&
+    !getCookieValue('utm_medium_first') &&
+    !getCookieValue('utm_campaign_first') &&
+    !getCookieValue('utm_content_first') &&
+    !getCookieValue('utm_term_first') &&
     (parsedUrl.searchParams.utm_source ||
       parsedUrl.searchParams.utm_medium ||
       parsedUrl.searchParams.utm_campaign ||
@@ -153,31 +172,31 @@ function storeFirstUTM() {
       'utm_source_first',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium_first',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign_first',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content_first',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term_first',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }
@@ -194,31 +213,31 @@ function storeLastUTM() {
       'utm_source',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }

@@ -51,7 +51,8 @@ ___TEMPLATE_PARAMETERS___
             "type": "NON_EMPTY"
           }
         ],
-        "defaultValue": "page_location_default"
+        "defaultValue": "page_location_default",
+        "alwaysInSummary": true
       },
       {
         "type": "SELECT",
@@ -71,7 +72,8 @@ ___TEMPLATE_PARAMETERS___
             "type": "NON_EMPTY"
           }
         ],
-        "defaultValue": "page_referrer_default"
+        "defaultValue": "page_referrer_default",
+        "alwaysInSummary": true
       },
       {
         "type": "TEXT",
@@ -84,7 +86,8 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "defaultValue": "(.*google\\..*)|(duckduckgo\\.com)|(.*bing\\.com)|(baidu\\..*)|(yandex\\..*)",
-        "help": "Used to determine if the user is referred by a search engine or not."
+        "help": "Used to determine if the user is referred by a search engine or not.",
+        "alwaysInSummary": true
       },
       {
         "type": "TEXT",
@@ -128,7 +131,17 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "help": "Channel Flow cookies expiration in seconds (set 0 for session cookie). \n\u003cbr\u003e\n2 years by default.",
-        "defaultValue": 63072000
+        "defaultValue": 63072000,
+        "valueUnit": "seconds",
+        "alwaysInSummary": true
+      },
+      {
+        "type": "CHECKBOX",
+        "name": "noEncodeCookie",
+        "checkboxText": "Do not encode cookie values",
+        "simpleValueType": true,
+        "help": "By default, cookie values are URI-encoded before being stored (e.g. \u003ci\u003egoogle/organic\u003c/i\u003e is stored as \u003ci\u003egoogle%2Forganic\u003c/i\u003e). This applies to the Channel Flow and UTM cookies.\n\u003cbr\u003e\u003cbr\u003e\nEnable this option to store the raw, unencoded values (the behavior of previous versions of this tag). Only do this if a system reading these cookies cannot decode them, since unencoded values may break some backends.",
+        "defaultValue": false
       }
     ]
   },
@@ -201,6 +214,7 @@ ___SANDBOXED_JS_FOR_SERVER___
 const getEventData = require('getEventData');
 const getAllEventData = require('getAllEventData');
 const getCookieValues = require('getCookieValues');
+const decodeUriComponent = require('decodeUriComponent');
 const setCookie = require('setCookie');
 const parseUrl = require('parseUrl');
 const makeString = require('makeString');
@@ -235,12 +249,23 @@ const cookieOptions = {
   secure: true,
   httpOnly: false
 };
-
 if (data.cookieTime > 0) cookieOptions['max-age'] = data.cookieTime;
 
-setCookie('channel_flow', channelFlow, cookieOptions, true);
-setCookie('channel_flow_first', getFirstChannelFromChannelFlow(channelFlow), cookieOptions, true);
-setCookie('channel_flow_last', getLastChannelFromChannelFlow(channelFlow), cookieOptions, true);
+const noEncodeCookie = !!data.noEncodeCookie;
+
+setCookie('channel_flow', channelFlow, cookieOptions, noEncodeCookie);
+setCookie(
+  'channel_flow_first',
+  getFirstChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
+setCookie(
+  'channel_flow_last',
+  getLastChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
 
 if (data.storeFirstUTM) storeFirstUTM();
 if (data.storeLastUTM) storeLastUTM();
@@ -252,7 +277,7 @@ Helpers
 ==============================================================================*/
 
 function getChannelFlow() {
-  const channelFlowCookie = getCookieValues('channel_flow')[0];
+  const channelFlowCookie = getCookieValue('channel_flow');
   const currentChannel = getCurrentChannel();
 
   if (!channelFlowCookie) {
@@ -263,13 +288,20 @@ function getChannelFlow() {
     return channelFlowCookie;
   }
 
-  const channelFlowLastCookie = getCookieValues('channel_flow_last')[0];
+  const channelFlowLastCookie = getCookieValue('channel_flow_last');
 
   if (currentChannel === channelFlowLastCookie) {
     return channelFlowCookie;
   }
 
   return channelFlowCookie + ',' + currentChannel;
+}
+
+function getCookieValue(name) {
+  const value = getCookieValues(name, true)[0];
+  if (!value) return value;
+  // Cookies stored unencoded by older versions may contain a literal '%' that can't be decoded.
+  return decodeUriComponent(value) || value;
 }
 
 function getCurrentChannel() {
@@ -338,11 +370,11 @@ function getFirstChannelFromChannelFlow(channelFlow) {
 
 function storeFirstUTM() {
   if (
-    !getCookieValues('utm_source_first')[0] &&
-    !getCookieValues('utm_medium_first')[0] &&
-    !getCookieValues('utm_campaign_first')[0] &&
-    !getCookieValues('utm_content_first')[0] &&
-    !getCookieValues('utm_term_first')[0] &&
+    !getCookieValue('utm_source_first') &&
+    !getCookieValue('utm_medium_first') &&
+    !getCookieValue('utm_campaign_first') &&
+    !getCookieValue('utm_content_first') &&
+    !getCookieValue('utm_term_first') &&
     (parsedUrl.searchParams.utm_source ||
       parsedUrl.searchParams.utm_medium ||
       parsedUrl.searchParams.utm_campaign ||
@@ -353,31 +385,31 @@ function storeFirstUTM() {
       'utm_source_first',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium_first',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign_first',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content_first',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term_first',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }
@@ -394,31 +426,31 @@ function storeLastUTM() {
       'utm_source',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }
@@ -1184,33 +1216,36 @@ scenarios:
   code: |-
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: google/organic
   code: |-
     mockData.referrerSource = 'https://google.com';
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'google/organic', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'google/organic', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: utm/parameters
   code: |-
     mockData.urlSource = 'https://demo.stape.io/?utm_source=utm&utm_medium=parameters';
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'utm/parameters', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'utm/parameters', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'utm/parameters', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'utm/parameters', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'utm/parameters', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'utm/parameters', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: referrer
   code: |-
     mockData.urlSource = 'https://demo.stape.io/';
@@ -1218,11 +1253,12 @@ scenarios:
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'stape.dev/referral', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'stape.dev/referral', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: referrer_exclude
   code: |-
     mockData.urlSource = 'https://demo.stape.io/';
@@ -1231,11 +1267,12 @@ scenarios:
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: When journey exists then referrer is added to journey
   code: |-
     mockData.urlSource = 'https://demo.stape.io/';
@@ -1245,11 +1282,12 @@ scenarios:
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none,stape.dev/referral', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: When ignore referrer hostname matches then referrer is not added to journey
   code: |-
     mockData.urlSource = 'https://demo.stape.io/';
@@ -1260,11 +1298,12 @@ scenarios:
 
     runCode(mockData);
 
-    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, true);
-    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, true);
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'direct/none', cookieOptions, false);
 
     assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: When ignore referrer hostname matches on first visit then no journey is created
   code: |-
     mockData.urlSource = 'https://demo.stape.io/';
@@ -1273,14 +1312,307 @@ scenarios:
 
     runCode(mockData);
 
+    assertApi('setCookie').wasNotCalled();
     assertApi('gtmOnFailure').wasCalled();
+    assertApi('gtmOnSuccess').wasNotCalled();
+- name: '[Cookie Encoding] Cookies are encoded by default and unencoded only when
+    noEncodeCookie is enabled'
+  code: |-
+    [
+      { noEncodeCookie: undefined, expected: false },
+      { noEncodeCookie: false, expected: false },
+      { noEncodeCookie: true, expected: true }
+    ].forEach((scenario) => {
+      const copyMockData = createMockData();
+      copyMockData.urlSource = 'https://demo.stape.io/?utm_source=a&utm_medium=b&utm_campaign=c&utm_content=d&utm_term=e';
+      copyMockData.storeFirstUTM = true;
+      copyMockData.storeLastUTM = true;
+      copyMockData.noEncodeCookie = scenario.noEncodeCookie;
+
+      const noEncodeArgs = [];
+      mock('getCookieValues', []);
+      mock('setCookie', (name, value, options, noEncode) => {
+        noEncodeArgs.push(noEncode);
+      });
+
+      runCode(copyMockData);
+
+      assertThat(noEncodeArgs).hasLength(13);
+      noEncodeArgs.forEach((noEncode) => assertThat(noEncode).isStrictlyEqualTo(scenario.expected));
+    });
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Channel] Missing utm_source or utm_medium falls back to direct or none'
+  code: |-
+    [
+      { query: '?utm_source=newsletter', expected: 'newsletter/none' },
+      { query: '?utm_medium=cpc', expected: 'direct/cpc' }
+    ].forEach((scenario) => {
+      const copyMockData = createMockData();
+      copyMockData.urlSource = 'https://demo.stape.io/' + scenario.query;
+
+      runCode(copyMockData);
+
+      assertApi('setCookie').wasCalledWith('channel_flow', scenario.expected, cookieOptions, false);
+    });
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Channel] Referrer from same hostname is treated as direct/none'
+  code: |-
+    mockData.referrerSource = 'https://demo.stape.io/other-page';
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Channel] Search engine hostname with www prefix is stripped'
+  code: |-
+    mockData.referrerSource = 'https://www.google.com/';
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Channel] Uses page_location and page_referrer from event data by default'
+  code: |-
+    mockData.urlSource = 'page_location_default';
+    mockData.referrerSource = 'page_referrer_default';
+
+    mock('getEventData', (key) => {
+      if (key === 'page_location') return 'https://demo.stape.io/';
+      if (key === 'page_referrer') return 'https://stape.dev/';
+    });
+
+    runCode(mockData);
+
+    assertApi('getEventData').wasCalledWith('page_location');
+    assertApi('getEventData').wasCalledWith('page_referrer');
+    assertApi('setCookie').wasCalledWith('channel_flow', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Same channel as last one is not duplicated in journey'
+  code: |-
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', (name) => {
+      if (name === 'channel_flow') return ['direct/none,stape.dev/referral'];
+      if (name === 'channel_flow_last') return ['stape.dev/referral'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'direct/none', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Direct visit keeps existing journey unchanged'
+  code: |-
+    mock('getCookieValues', (name) => {
+      if (name === 'channel_flow') return ['google/organic,stape.dev/referral'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Encoded cookies are read raw and decoded before being extended'
+  code: |-
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', (name, noDecode) => {
+      assertThat(noDecode).isTrue();
+      if (name === 'channel_flow') return ['google%2Forganic%2Cfacebook%2Fcpc'];
+      if (name === 'channel_flow_last') return ['facebook%2Fcpc'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic,facebook/cpc,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Legacy unencoded cookie with invalid percent sequence is kept as is instead of crashing'
+  code: |-
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', (name) => {
+      if (name === 'channel_flow') return ['50%off/cpc'];
+      if (name === 'channel_flow_last') return ['50%off/cpc'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', '50%off/cpc,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', '50%off/cpc', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Cookie Options] Session cookie is set without max-age when cookieTime is
+    0'
+  code: |-
+    mockData.cookieTime = 0;
+
+    const sessionCookieOptions = {
+      domain: 'auto',
+      path: '/',
+      samesite: 'Lax',
+      secure: true,
+      httpOnly: false
+    };
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'direct/none', sessionCookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Failure] Invalid URL source fails without setting cookies'
+  code: |-
+    mockData.urlSource = 'not a url';
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasNotCalled();
+    assertApi('gtmOnFailure').wasCalled();
+    assertApi('gtmOnSuccess').wasNotCalled();
+- name: '[UTM] Stores first and last UTM cookies when no first UTM cookies exist'
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/?utm_source=src&utm_medium=med&utm_campaign=camp';
+    mockData.storeFirstUTM = true;
+    mockData.storeLastUTM = true;
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('utm_source_first', 'src', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_medium_first', 'med', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_campaign_first', 'camp', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_content_first', '', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_term_first', '', cookieOptions, false);
+
+    assertApi('setCookie').wasCalledWith('utm_source', 'src', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_medium', 'med', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_campaign', 'camp', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_content', '', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_term', '', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[UTM] First UTM cookies are not overwritten when one already exists'
+  code: |-
+    mockData.urlSource = 'https://demo.stape.io/?utm_source=src&utm_medium=med';
+    mockData.storeFirstUTM = true;
+    mockData.storeLastUTM = true;
+
+    mock('getCookieValues', (name) => {
+      if (name === 'utm_campaign_first') return ['old_campaign'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasNotCalledWith('utm_source_first', 'src', cookieOptions, false);
+    assertApi('setCookie').wasNotCalledWith('utm_medium_first', 'med', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_source', 'src', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('utm_medium', 'med', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[UTM] No UTM cookies are set when URL has no UTM parameters or options are
+    off'
+  code: |-
+    const utmCookieNames = [];
+    mock('setCookie', (name) => {
+      if (name.indexOf('utm_') === 0) utmCookieNames.push(name);
+    });
+
+    mockData.urlSource = 'https://demo.stape.io/?gclid=123';
+    mockData.storeFirstUTM = true;
+    mockData.storeLastUTM = true;
+    runCode(mockData);
+
+    const copyMockData = createMockData();
+    copyMockData.urlSource = 'https://demo.stape.io/?utm_source=src';
+    runCode(copyMockData);
+
+    assertThat(utmCookieNames).hasLength(0);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Consent] Tag aborts without setting cookies when consent is denied'
+  code: |-
+    [
+      { eventData: { consent_state: { analytics_storage: false } }, parameters: ['analytics_storage'] },
+      { eventData: { consent_state: { analytics_storage: true, ad_storage: false } }, parameters: ['analytics_storage', 'ad_storage'] },
+      { eventData: { 'x-ga-gcs': 'G100' }, parameters: ['analytics_storage'] },
+      { eventData: { 'x-ga-gcs': 'G101' }, parameters: ['analytics_storage', 'ad_storage'] },
+      { eventData: {}, parameters: ['analytics_storage'] }
+    ].forEach((scenario) => {
+      const copyMockData = createMockData();
+      copyMockData.consent = 'required';
+      copyMockData.consentStatusParameters = scenario.parameters.map((p) => ({ parameter: p }));
+
+      mock('getAllEventData', () => scenario.eventData);
+
+      runCode(copyMockData);
+    });
+
+    assertApi('setCookie').wasNotCalled();
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Consent] Tag sets cookies when all required consents are granted'
+  code: |-
+    let setCookieCalls = 0;
+    mock('setCookie', () => {
+      setCookieCalls++;
+    });
+
+    [
+      { eventData: { consent_state: { analytics_storage: true, ad_storage: true } }, parameters: ['analytics_storage', 'ad_storage'] },
+      { eventData: { 'x-ga-gcs': 'G111' }, parameters: ['analytics_storage', 'ad_storage'] },
+      { eventData: { 'x-ga-gcs': 'G101' }, parameters: ['analytics_storage'] }
+    ].forEach((scenario) => {
+      const copyMockData = createMockData();
+      copyMockData.consent = 'required';
+      copyMockData.consentStatusParameters = scenario.parameters.map((p) => ({ parameter: p }));
+
+      mock('getAllEventData', () => scenario.eventData);
+
+      runCode(copyMockData);
+    });
+
+    assertThat(setCookieCalls).isEqualTo(9);
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 setup: |-
-  const mockData = {
+  const createMockData = () => ({
     urlSource: 'https://demo.stape.io/',
     referrerSource: '',
     searchEngineExpression: '.*google.*',
-    cookieTime: 63072000
-  };
+    cookieTime: 63072000,
+    consent: 'optional'
+  });
+
+  const mockData = createMockData();
 
   const cookieOptions = {
       domain: 'auto',
@@ -1291,8 +1623,18 @@ setup: |-
   };
   cookieOptions['max-age'] = 63072000;
 
+  mock('getAllEventData', () => ({}));
+  mock('getCookieValues', []);
+
 
 ___NOTES___
+
+2026-10-15 - Change Notes:
+  - BREAKING CHANGE: Channel Flow and UTM cookie values are now URI-encoded by default (e.g. google/organic is stored as google%2Forganic) to avoid errors in backends and systems that reject unencoded cookies. Anything reading these cookies directly must now decode them
+  - Add "Do not encode cookie values" checkbox to opt back into the previous unencoded behavior
+  - Fix tag crashing with "URI malformed" when an existing cookie (e.g. stored unencoded by a previous version) contains an invalid percent sequence: cookies are now read raw and decoded safely, falling back to the raw value
+  - Show URL Source, Referrer Source, Search Engines Regular Expression and Cookie lifetime in the tag summary, and label the cookie lifetime unit as seconds
+  - Expand unit tests to cover cookie encoding, UTM cookies, consent enforcement, session cookies, journey deduplication and invalid URL handling
 
 2026-06-02 - Change Notes:
   - Add multi-parameter consent enforcement for required mode: the tag now checks all selected consent status parameters and aborts execution if any are denied, for both consent_state and x-ga-gcs inputs
