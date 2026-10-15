@@ -214,6 +214,7 @@ ___SANDBOXED_JS_FOR_SERVER___
 const getEventData = require('getEventData');
 const getAllEventData = require('getAllEventData');
 const getCookieValues = require('getCookieValues');
+const decodeUriComponent = require('decodeUriComponent');
 const setCookie = require('setCookie');
 const parseUrl = require('parseUrl');
 const makeString = require('makeString');
@@ -276,7 +277,7 @@ Helpers
 ==============================================================================*/
 
 function getChannelFlow() {
-  const channelFlowCookie = getCookieValues('channel_flow')[0];
+  const channelFlowCookie = getCookieValue('channel_flow');
   const currentChannel = getCurrentChannel();
 
   if (!channelFlowCookie) {
@@ -287,13 +288,20 @@ function getChannelFlow() {
     return channelFlowCookie;
   }
 
-  const channelFlowLastCookie = getCookieValues('channel_flow_last')[0];
+  const channelFlowLastCookie = getCookieValue('channel_flow_last');
 
   if (currentChannel === channelFlowLastCookie) {
     return channelFlowCookie;
   }
 
   return channelFlowCookie + ',' + currentChannel;
+}
+
+function getCookieValue(name) {
+  const value = getCookieValues(name, true)[0];
+  if (!value) return value;
+  // Cookies stored unencoded by older versions may contain a literal '%' that can't be decoded.
+  return decodeUriComponent(value) || value;
 }
 
 function getCurrentChannel() {
@@ -362,11 +370,11 @@ function getFirstChannelFromChannelFlow(channelFlow) {
 
 function storeFirstUTM() {
   if (
-    !getCookieValues('utm_source_first')[0] &&
-    !getCookieValues('utm_medium_first')[0] &&
-    !getCookieValues('utm_campaign_first')[0] &&
-    !getCookieValues('utm_content_first')[0] &&
-    !getCookieValues('utm_term_first')[0] &&
+    !getCookieValue('utm_source_first') &&
+    !getCookieValue('utm_medium_first') &&
+    !getCookieValue('utm_campaign_first') &&
+    !getCookieValue('utm_content_first') &&
+    !getCookieValue('utm_term_first') &&
     (parsedUrl.searchParams.utm_source ||
       parsedUrl.searchParams.utm_medium ||
       parsedUrl.searchParams.utm_campaign ||
@@ -1422,6 +1430,43 @@ scenarios:
 
     assertApi('gtmOnSuccess').wasCalled();
     assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Encoded cookies are read raw and decoded before being extended'
+  code: |-
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', (name, noDecode) => {
+      assertThat(noDecode).isTrue();
+      if (name === 'channel_flow') return ['google%2Forganic%2Cfacebook%2Fcpc'];
+      if (name === 'channel_flow_last') return ['facebook%2Fcpc'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', 'google/organic,facebook/cpc,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', 'google/organic', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
+- name: '[Journey] Legacy unencoded cookie with invalid percent sequence is kept as is instead of crashing'
+  code: |-
+    mockData.referrerSource = 'https://stape.dev';
+
+    mock('getCookieValues', (name) => {
+      if (name === 'channel_flow') return ['50%off/cpc'];
+      if (name === 'channel_flow_last') return ['50%off/cpc'];
+      return [];
+    });
+
+    runCode(mockData);
+
+    assertApi('setCookie').wasCalledWith('channel_flow', '50%off/cpc,stape.dev/referral', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_first', '50%off/cpc', cookieOptions, false);
+    assertApi('setCookie').wasCalledWith('channel_flow_last', 'stape.dev/referral', cookieOptions, false);
+
+    assertApi('gtmOnSuccess').wasCalled();
+    assertApi('gtmOnFailure').wasNotCalled();
 - name: '[Cookie Options] Session cookie is set without max-age when cookieTime is
     0'
   code: |-
@@ -1583,6 +1628,10 @@ setup: |-
 
 
 ___NOTES___
+
+2026-10-15 - Change Notes:
+  - Fix tag crashing with "URI malformed" when an existing cookie (e.g. stored unencoded by a previous version) contains an invalid percent sequence: cookies are now read raw (getCookieValues with noDecode) and decoded with decodeUriComponent, falling back to the raw value so the cookie is rewritten encoded and the visitor's journey is preserved
+  - Add unit tests for decoding encoded cookies and for legacy cookies with invalid percent sequences
 
 2026-10-15 - Change Notes:
   - BREAKING CHANGE: Channel Flow and UTM cookie values are now URI-encoded by default (e.g. google/organic is stored as google%2Forganic) to avoid errors in backends and systems that reject unencoded cookies. Anything reading these cookies directly must now decode them

@@ -1,8 +1,8 @@
 homepage: 'https://stape.io/'
 documentation: 'https://github.com/stape-io/channel-flow-tag'
 versions:
-  - sha: 9335cb6202916313a755c708bbe739c25185c6f0
-    changeNotes: BREAKING CHANGE - Cookie values are now URI-encoded by default. Add option to store them unencoded.
+  - sha: f89f080802e23ecb39930929a26f2580367a4d3d
+    changeNotes: BREAKING CHANGE - Cookie values are now URI-encoded by default. Add option to store them unencoded. Fix crash on cookies with malformed URI encoding.
   - sha: 52cbad79d2fff42f68edc123eb2a1d36ae11459c
     changeNotes: Add support to consent settings.
   - sha: 738f198e218abfac2ee70c8da83943714fc83e38
