@@ -35,12 +35,23 @@ const cookieOptions = {
   secure: true,
   httpOnly: false
 };
-
 if (data.cookieTime > 0) cookieOptions['max-age'] = data.cookieTime;
 
-setCookie('channel_flow', channelFlow, cookieOptions, true);
-setCookie('channel_flow_first', getFirstChannelFromChannelFlow(channelFlow), cookieOptions, true);
-setCookie('channel_flow_last', getLastChannelFromChannelFlow(channelFlow), cookieOptions, true);
+const noEncodeCookie = !!data.noEncodeCookie;
+
+setCookie('channel_flow', channelFlow, cookieOptions, noEncodeCookie);
+setCookie(
+  'channel_flow_first',
+  getFirstChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
+setCookie(
+  'channel_flow_last',
+  getLastChannelFromChannelFlow(channelFlow),
+  cookieOptions,
+  noEncodeCookie
+);
 
 if (data.storeFirstUTM) storeFirstUTM();
 if (data.storeLastUTM) storeLastUTM();
@@ -153,31 +164,31 @@ function storeFirstUTM() {
       'utm_source_first',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium_first',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign_first',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content_first',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term_first',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }
@@ -194,31 +205,31 @@ function storeLastUTM() {
       'utm_source',
       parsedUrl.searchParams.utm_source ? makeString(parsedUrl.searchParams.utm_source) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_medium',
       parsedUrl.searchParams.utm_medium ? makeString(parsedUrl.searchParams.utm_medium) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_campaign',
       parsedUrl.searchParams.utm_campaign ? makeString(parsedUrl.searchParams.utm_campaign) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_content',
       parsedUrl.searchParams.utm_content ? makeString(parsedUrl.searchParams.utm_content) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
     setCookie(
       'utm_term',
       parsedUrl.searchParams.utm_term ? makeString(parsedUrl.searchParams.utm_term) : '',
       cookieOptions,
-      true
+      noEncodeCookie
     );
   }
 }
